@@ -113,6 +113,14 @@ class HomePage extends ConsumerWidget {
                   const SizedBox(height: 32),
                 ],
 
+                // Sponsors Section
+                _buildSponsorsSection(context),
+                const SizedBox(height: 32),
+
+                // Job Opportunities Section
+                _buildJobOpportunitiesSection(context),
+                const SizedBox(height: 32),
+
                 // White Label Demo (only show in debug mode)
                 if (hasCustomBranding && kDebugMode) ...[
                   const SizedBox(height: 32),
@@ -698,6 +706,256 @@ class HomePage extends ConsumerWidget {
                     ).colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                 ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSponsorsSection(BuildContext context) {
+    return Consumer(
+      builder: (context, ref, child) {
+        final sponsors = ref.watch(sponsorsProvider);
+
+        if (sponsors.isEmpty) return const SizedBox.shrink();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionHeader(context, 'Our Sponsors', sponsors.length),
+            const SizedBox(height: 20),
+
+            // Platinum sponsors (larger)
+            Consumer(
+              builder: (context, ref, child) {
+                final platinumSponsors = ref.watch(platinumSponsorsProvider);
+                if (platinumSponsors.isEmpty) return const SizedBox.shrink();
+
+                return Column(
+                  children: [
+                    Text(
+                      'Platinum Sponsors',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        int crossAxisCount = constraints.maxWidth > 800 ? 4 : 2;
+                        return Wrap(
+                          spacing: 16,
+                          runSpacing: 16,
+                          children: platinumSponsors
+                              .map(
+                                (sponsor) => SponsorCard(
+                                  sponsor: sponsor,
+                                  width:
+                                      (constraints.maxWidth -
+                                          16 * (crossAxisCount - 1)) /
+                                      crossAxisCount,
+                                  height: 120,
+                                ),
+                              )
+                              .toList(),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 24),
+                  ],
+                );
+              },
+            ),
+
+            // Gold and Silver sponsors (smaller)
+            Consumer(
+              builder: (context, ref, child) {
+                final goldSponsors = ref.watch(goldSponsorsProvider);
+                final silverSponsors = ref.watch(silverSponsorsProvider);
+                final otherSponsors = [...goldSponsors, ...silverSponsors];
+
+                if (otherSponsors.isEmpty) return const SizedBox.shrink();
+
+                return Column(
+                  children: [
+                    Text(
+                      'Gold & Silver Sponsors',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        int crossAxisCount = constraints.maxWidth > 800 ? 6 : 3;
+                        return Wrap(
+                          spacing: 12,
+                          runSpacing: 12,
+                          children: otherSponsors
+                              .map(
+                                (sponsor) => SponsorCard(
+                                  sponsor: sponsor,
+                                  width:
+                                      (constraints.maxWidth -
+                                          12 * (crossAxisCount - 1)) /
+                                      crossAxisCount,
+                                  height: 80,
+                                ),
+                              )
+                              .toList(),
+                        );
+                      },
+                    ),
+                  ],
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildJobOpportunitiesSection(BuildContext context) {
+    return Consumer(
+      builder: (context, ref, child) {
+        final jobs = ref.watch(activeJobsProvider);
+
+        if (jobs.isEmpty) return const SizedBox.shrink();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Job Opportunities',
+                        style: Theme.of(context).textTheme.headlineSmall
+                            ?.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                      Text(
+                        '${jobs.length} active positions',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.7),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: () => _showAllJobs(context, ref),
+                  icon: const Icon(Icons.arrow_forward_ios_rounded, size: 14),
+                  label: const Text('View All'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+
+            // Job cards in responsive grid
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // Responsive layout
+                if (constraints.maxWidth > 1200) {
+                  // Large screens: 3 columns
+                  return GridView.count(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 20,
+                    mainAxisSpacing: 20,
+                    childAspectRatio: 0.8,
+                    children: jobs
+                        .take(6)
+                        .map((job) => JobCard(job: job))
+                        .toList(),
+                  );
+                } else if (constraints.maxWidth > 800) {
+                  // Medium screens: 2 columns
+                  return GridView.count(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 0.9,
+                    children: jobs
+                        .take(4)
+                        .map((job) => JobCard(job: job))
+                        .toList(),
+                  );
+                } else {
+                  // Small screens: 1 column
+                  return Column(
+                    children: jobs
+                        .take(3)
+                        .map(
+                          (job) => Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: JobCard(job: job),
+                          ),
+                        )
+                        .toList(),
+                  );
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showAllJobs(BuildContext context, WidgetRef ref) {
+    final jobs = ref.read(activeJobsProvider);
+
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'All Job Opportunities',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.8,
+                height: MediaQuery.of(context).size.height * 0.6,
+                child: jobs.isEmpty
+                    ? const Center(
+                        child: Text('No job opportunities available'),
+                      )
+                    : ListView.separated(
+                        itemCount: jobs.length,
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 16),
+                        itemBuilder: (context, index) =>
+                            JobCard(job: jobs[index]),
+                      ),
               ),
             ],
           ),

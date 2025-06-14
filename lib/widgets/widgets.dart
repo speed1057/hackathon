@@ -5,3 +5,4 @@ export 'score_input_widget.dart';
 export 'organization_logo.dart';
 export 'white_label_demo.dart';
 export 'common/common_widgets.dart';
+export 'sponsor_widgets.dart';
