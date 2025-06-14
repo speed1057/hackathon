@@ -1,0 +1,11 @@
+[build]
+  publish = "build/web"
+  command = "flutter pub get && flutter build web --release --base-href / -O 4"
+
+[build.environment]
+  FLUTTER_VERSION = "3.8.1"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
