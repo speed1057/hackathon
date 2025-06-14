@@ -746,17 +746,18 @@ class HomePage extends ConsumerWidget {
                       builder: (context, constraints) {
                         int crossAxisCount = constraints.maxWidth > 800 ? 4 : 2;
                         return Wrap(
-                          spacing: 16,
-                          runSpacing: 16,
+                          spacing: 12,
+                          runSpacing: 12,
                           children: platinumSponsors
                               .map(
                                 (sponsor) => SponsorCard(
                                   sponsor: sponsor,
                                   width:
                                       (constraints.maxWidth -
-                                          16 * (crossAxisCount - 1)) /
+                                          12 * (crossAxisCount - 1)) /
                                       crossAxisCount,
-                                  height: 120,
+                                  height: 100,
+                                  isCompact: false,
                                 ),
                               )
                               .toList(),
@@ -791,17 +792,18 @@ class HomePage extends ConsumerWidget {
                       builder: (context, constraints) {
                         int crossAxisCount = constraints.maxWidth > 800 ? 6 : 3;
                         return Wrap(
-                          spacing: 12,
-                          runSpacing: 12,
+                          spacing: 8,
+                          runSpacing: 8,
                           children: otherSponsors
                               .map(
                                 (sponsor) => SponsorCard(
                                   sponsor: sponsor,
                                   width:
                                       (constraints.maxWidth -
-                                          12 * (crossAxisCount - 1)) /
+                                          8 * (crossAxisCount - 1)) /
                                       crossAxisCount,
                                   height: 80,
+                                  isCompact: true,
                                 ),
                               )
                               .toList(),
@@ -863,44 +865,44 @@ class HomePage extends ConsumerWidget {
             // Job cards in responsive grid
             LayoutBuilder(
               builder: (context, constraints) {
-                // Responsive layout
+                // Responsive layout with optimized sizing
                 if (constraints.maxWidth > 1200) {
-                  // Large screens: 3 columns
+                  // Large screens: 3 columns with better aspect ratio
                   return GridView.count(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     crossAxisCount: 3,
-                    crossAxisSpacing: 20,
-                    mainAxisSpacing: 20,
-                    childAspectRatio: 0.8,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 0.75,
                     children: jobs
                         .take(6)
-                        .map((job) => JobCard(job: job))
+                        .map((job) => JobCard(job: job, isCompact: false))
                         .toList(),
                   );
                 } else if (constraints.maxWidth > 800) {
-                  // Medium screens: 2 columns
+                  // Medium screens: 2 columns with compact sizing
                   return GridView.count(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 0.9,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 0.8,
                     children: jobs
                         .take(4)
-                        .map((job) => JobCard(job: job))
+                        .map((job) => JobCard(job: job, isCompact: true))
                         .toList(),
                   );
                 } else {
-                  // Small screens: 1 column
+                  // Small screens: 1 column, compact sizing
                   return Column(
                     children: jobs
                         .take(3)
                         .map(
                           (job) => Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: JobCard(job: job),
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: JobCard(job: job, isCompact: true),
                           ),
                         )
                         .toList(),
@@ -952,9 +954,9 @@ class HomePage extends ConsumerWidget {
                     : ListView.separated(
                         itemCount: jobs.length,
                         separatorBuilder: (context, index) =>
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 12),
                         itemBuilder: (context, index) =>
-                            JobCard(job: jobs[index]),
+                            JobCard(job: jobs[index], isCompact: true),
                       ),
               ),
             ],
